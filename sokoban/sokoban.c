@@ -83,7 +83,9 @@ int main()
 	int move = 0;
 	int start_time, end_time;
 	double gametime = 0;
-	int bex, bey, re;
+	int bex, bey;
+	int re = 1;
+	int packmove = 0;
 
 	showcursor(FALSE);
 	time_t start = time(NULL);
@@ -118,15 +120,16 @@ int main()
 			putsxy(nx * 2, ny, arTile[MAN - '0']);
 
 			gotoxy(45, 8);
-			printf("움직인 횟수 : %d", move);
+			printf("움직인 횟수 : %d회", move);
 			gotoxy(45, 10);
-			printf("경과 시간 : %lf", gametime);
+			printf("경과 시간 : %lfs", gametime);
 
 			// 주인공 이동
 			ch = getch();
 			if (ch == 0xE0 || ch == 0) {
 				ch = getch();
 				dx = dy = 0;
+				packmove = 0;
 				switch (ch) {
 				case LEFT:
 					dx = -1;
@@ -158,6 +161,7 @@ int main()
 								ns[ny + dy][nx + dx] = EMPTY;
 							}
 							ns[ny + dy * 2][nx + dx * 2] = PACK;
+							packmove++;
 						}
 						else {
 							dx = dy = 0;
@@ -165,7 +169,6 @@ int main()
 						}
 					}
 					// 새 위치로 이동
-					re = 1;
 					bex = nx;
 					bey = ny;
 					nx += dx;
@@ -173,15 +176,16 @@ int main()
 					move++;
 				}
 				else {
-					re = 0;
+					re--;
 				}
 			}
 			else {
 				if (ch == BACKSPACE && re != 0) {
 					re--;
-					if (ns[ny + dy][nx + dx] == PACK) {
+					if (ns[ny + dy][nx + dx] == PACK && packmove != 0) {
 						ns[bey + dy * 2][bex + dx * 2] = EMPTY;
 						ns[bey + dy][bex + dx] = PACK;
+						packmove--;
 					}
 					nx = bex;
 					ny = bey;
@@ -192,14 +196,17 @@ int main()
 				}
 				if (ch == '1') {
 					stage = 0;
+					re = 1;
 					break;
 				}
 				if (ch == '2') {
 					stage = 1;
+					re = 1;
 					break;
 				}
 				if (ch == '3') {
 					stage = 2;
+					re = 1;
 					break;
 				}
 			}
@@ -224,4 +231,3 @@ int main()
 		}
 	}
 }
-
